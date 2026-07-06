@@ -32,11 +32,11 @@ Every project gets all of these. Exact commands and config templates are in `ref
 | Layer | Tool |
 |-------|------|
 | Module | Go modules |
-| Language | Go 1.24+ |
+| Language | Go 1.25+ (1.26 current) |
 | Build | `go build` |
 | Dev runner | `air` for long-running apps; skip for libraries |
-| Format | `gofmt` + `goimports` |
-| Lint | `golangci-lint` |
+| Format | `gofmt` + `goimports` (run via `golangci-lint fmt`) |
+| Lint | `golangci-lint` (v2) |
 | Test | `go test -cover ./...` |
 | Git hooks | Lefthook |
 | Commits | Conventional, enforced by `scripts/commit-msg.sh` |
