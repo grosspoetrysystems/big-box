@@ -10,6 +10,8 @@ go get github.com/anthropics/anthropic-sdk-go@latest
 go get google.golang.org/genai@latest
 ```
 
+Current majors (mid-2026): `openai-go/v3` (Responses API is its primary surface), `anthropic-sdk-go` is now v1-stable (no path suffix, so `@latest` resolves it), and `google.golang.org/genai` is the unified Google SDK (replaces the retired `generative-ai-go`). All three now offer native structured-output/auto-parse helpers — prefer those over hand-rolled JSON coercion when a provider exposes them, still validating locally at the adapter boundary per the Schema contract.
+
 ```go
 // internal/ai/model.go
 package ai
