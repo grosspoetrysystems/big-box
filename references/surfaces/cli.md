@@ -1,8 +1,28 @@
 # CLI Surface
 
+## Framework
+Incur is the default CLI framework for agent-aware commands. It provides typed
+schemas, structured output, MCP exposure, generated skills, and machine-readable
+command manifests. Keep Ink when the CLI needs interactive terminal rendering.
+
+For a minimal human-first CLI, Commander is a valid lower-opinion alternative:
+
+```bash
+pnpm add commander
+```
+
+Do not install Commander and incur unless the project has a deliberate reason to
+use both.
+
 ## Extra deps
 ```bash
-pnpm add ink @inkjs/ui commander
+pnpm add incur
+```
+
+Add Ink only for interactive terminal UIs:
+
+```bash
+pnpm add ink @inkjs/ui
 pnpm add -D @types/ink
 ```
 
@@ -41,17 +61,23 @@ src/
 
 ## Entry file: src/bin/cli.ts
 ```typescript
-import { program } from "commander";
+import { Cli, z } from "incur";
 
-program
-  .name("<project-name>")
-  .version("0.1.0")
-  .description("<description>")
-  .action(() => {
-    console.log("ready");
-  });
+const cli = Cli.create("<project-name>", {
+  version: "0.1.0",
+  description: "<description>",
+});
 
-program.parse();
+cli.command("status", {
+  output: z.object({
+    ready: z.boolean(),
+  }),
+  run() {
+    return { ready: true };
+  },
+});
+
+cli.serve();
 ```
 
 ## Scripts override
