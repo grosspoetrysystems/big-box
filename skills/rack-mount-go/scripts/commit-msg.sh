@@ -2,8 +2,8 @@
 set -eu
 
 msg_file=${1:?commit message file required}
-header=$(sed -n '1p' "$msg_file" | tr -d '\r')
-line_count=$(wc -l < "$msg_file" | tr -d ' ')
+# Drop git's comment lines and surrounding blanks, then take the subject line.
+header=$(git stripspace --strip-comments < "$msg_file" | sed -n '1p' | tr -d '\r')
 
 if [ -z "$header" ]; then
   echo "commit message header is required" >&2
@@ -11,15 +11,10 @@ if [ -z "$header" ]; then
 fi
 
 case "$header" in
-  Merge\ *|Revert\ *)
+  Merge\ *|Revert\ *|fixup!\ *|squash!\ *)
     exit 0
     ;;
 esac
-
-if [ "$line_count" -ne 1 ]; then
-  echo "commit message must be a single line" >&2
-  exit 1
-fi
 
 if [ "${#header}" -gt 100 ]; then
   echo "commit message header must be 100 characters or fewer" >&2
