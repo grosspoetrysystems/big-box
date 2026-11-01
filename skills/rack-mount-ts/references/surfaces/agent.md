@@ -2,7 +2,7 @@
 
 ## Extra deps
 ```bash
-pnpm add ai @modelcontextprotocol/sdk zod
+pnpm add ai @ai-sdk/workflow @modelcontextprotocol/sdk zod
 ```
 Add a provider package (`@ai-sdk/openai`, `@ai-sdk/anthropic`, …) only if you need provider-specific options; otherwise a Gateway model string needs no provider dep.
 
@@ -13,7 +13,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: ["src/index.ts"],
   format: "esm",
-  target: "node22",
+  target: "node24",
   outDir: "dist",
   clean: true,
   sourcemap: true,
@@ -25,8 +25,8 @@ export default defineConfig({
 ```json
 {
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts"
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
 }
 ```
 
@@ -50,17 +50,17 @@ import { generateText } from "ai";
 // Gateway-resolved model string — swap providers by changing one string.
 const MODEL = "anthropic/claude-haiku-4-5";
 
-export async function createAgent() {
+export const createAgent = async (): Promise<string> => {
   const result = await generateText({ model: MODEL, prompt: "ready" });
   return result.text;
-}
+};
 ```
 
 ## Notes
-- Vercel AI SDK provides the unified LLM interface. As of AI SDK 7 (mid-2026) it also ships a first-class `Agent` class and durable `WorkflowAgent` for tool loops — prefer those over hand-rolling a loop around `generateText` when the agent has tools. `generateText`/`streamText` remain the primitives underneath.
+- Vercel AI SDK provides the unified LLM interface. Use its `Agent` class or the durable `WorkflowAgent` from `@ai-sdk/workflow` when the agent has tools; `generateText`/`streamText` remain the primitives underneath.
 - Tool definitions use `inputSchema`/`outputSchema` (renamed from `parameters`/`result` in AI SDK 5).
 - MCP SDK for tool/resource server integration
 - Zod (v4) for structured I/O validation
 - Add `@ai-sdk/anthropic`, `@ai-sdk/google` etc. as needed for multi-provider
 - Model IDs move fast — resolve them through the AI Gateway (a provider-prefixed string like `openai/…` or `anthropic/…`) rather than pinning a hardcoded model in code, so a model swap stays a one-string change.
-- For multi-agent delegation specifically, the OpenAI Agents SDK is a separate package (`@openai/agents`) — see the `/cable-run` Workflow contract.
+- For multi-agent delegation specifically, the OpenAI Agents SDK is a separate package (`@openai/agents`) — see the [cable-run-ts Workflow contract](https://github.com/grosspoetrysystems/big-box/tree/main/skills/cable-run-ts).

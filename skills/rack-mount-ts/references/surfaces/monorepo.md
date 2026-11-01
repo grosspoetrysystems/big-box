@@ -37,7 +37,8 @@ pnpm-workspace.yaml
 turbo.json
 package.json
 tsconfig.json (base, extended by packages)
-biome.jsonc
+oxlint.config.ts
+oxfmt.config.ts
 lefthook.yml
 commitlint.config.js
 ```
@@ -51,6 +52,7 @@ Use `references` for package-level type checking:
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
+    "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "declaration": true,
@@ -58,6 +60,7 @@ Use `references` for package-level type checking:
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "isolatedDeclarations": true,
     "composite": true
   }
 }
@@ -82,4 +85,4 @@ Each package extends this and sets its own `rootDir`, `outDir`.
 - Do NOT install surface deps at root — each package gets its own
 - Use `rack-mount` again inside each package to set up its surface
 - Lefthook and commitlint live at root only
-- Biome config at root, packages inherit
+- Oxlint/Oxfmt config at root, packages inherit
