@@ -17,7 +17,7 @@ export async function analyzeAndSummarize(input: string) {
 }
 ```
 
-Swap when: you need more than sequential calls. For a single agent that loops over tools, use `ToolLoopAgent` from `ai`; reserve a multi-agent framework for handoffs or guardrails.
+Swap when: you need more than sequential calls.
 
 ## Opt-in: Effect
 
@@ -58,13 +58,12 @@ Swap when: a workflow is long-running or multi-step and needs to survive crashes
 
 All keep the workflow *definition* in your repo — an upgrade of the Workflow contract's implementation, not a migration away from it.
 
-
 ## Decision guide
 
 | Need | Use |
 |------|-----|
 | Sequential LLM calls | async functions |
-| Error recovery, retries, timeouts | Effect when already adopted or complexity justifies it |
+| Error recovery, retries, timeouts | plain async + a retry helper; Effect when already adopted |
 | Multi-agent delegation | Agents SDK (`@openai/agents`) |
 | Long-running, crash-safe, pause/resume | WorkflowAgent on WDK, Inngest, Trigger.dev, or Temporal |
 | All of the above | Keep async for simple paths; combine only the reliability, delegation, and durable-runtime pieces the project actually needs |

@@ -1,7 +1,7 @@
 ---
 name: cable-run-ts
 description: >
-  Use after [rack-mount-ts](https://github.com/grosspoetrysystems/big-box/tree/main/skills/rack-mount-ts) (or on an existing TypeScript or Node.js
+  Use after rack-mount-ts (or on an existing TypeScript or Node.js
   project) when the user needs to wire up AI/inference architecture.
   "add AI to this project", "wire up inference", "set up model access",
   "add LLM support", "set up structured output",
@@ -41,7 +41,7 @@ Cable-run is built on three contracts. Each has a default and alternatives. The 
 
 1. Ask: which contracts does this project need? (most need Schema + Model at minimum)
 2. For each contract, use the default unless the user has a specific constraint
-3. Read the contract reference in `references/` for the wiring details, including the operations guidance
+3. Read the contract reference in `references/` for the wiring details
 4. Create `src/ai/` as the inference home — contracts live here, surfaces import from here
 5. Wire the chosen implementations into the contract interfaces
 
@@ -52,10 +52,7 @@ Cable-run is built on three contracts. Each has a default and alternatives. The 
 | Schema | `references/schema.md` |
 | Model | `references/model.md` |
 | Workflow | `references/workflow.md` |
-
-| Operations | Reference |
-|------------|-----------|
-| MCP, evals, tracing, prompt caching | `references/practices.md` |
+| Operations (MCP, evals, tracing, caching) | `references/practices.md` |
 
 ## Architecture principle
 
