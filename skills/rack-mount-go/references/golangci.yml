@@ -7,10 +7,8 @@ linters:
   default: standard
   enable:
     - bodyclose
-    - gocritic
     - gosec
     - misspell
-    - revive
   exclusions:
     generated: strict
     rules:
@@ -20,8 +18,8 @@ linters:
 
 formatters:
   enable:
-    - gofmt
-    - goimports
+    - gofumpt
+    - gci
 
 issues:
   max-issues-per-linter: 0

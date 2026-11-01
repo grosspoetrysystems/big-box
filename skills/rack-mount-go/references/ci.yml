@@ -1,0 +1,35 @@
+name: go
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        go-version: ["1.26.x", "1.27.x"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out
+        uses: actions/checkout@v7
+      - name: set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+      - name: build
+        run: go build ./...
+      - name: vet
+        run: go vet ./...
+      - name: test
+        run: go test -race -cover ./...
+      - name: verify golangci-lint config
+        run: go tool golangci-lint config verify
+      - name: lint
+        run: go tool golangci-lint run ./...
+      - name: check vulnerabilities
+        run: go tool govulncheck ./...
