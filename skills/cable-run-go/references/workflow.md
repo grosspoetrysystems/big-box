@@ -54,7 +54,7 @@ func AnalyzeAndSummarize(ctx context.Context, client Client, input string) (Resu
 }
 ```
 
-The two model calls are independent, so this is genuine parallel fan-out rather than a dependent call wrapped in a goroutine. Use `context.WithTimeout` for deadlines, `rate.Limiter` for backpressure, and `backoff/v7` for retries (verified 2026-11-01). Use OpenTelemetry's `genaiconv` package for standard GenAI spans and token/cost metrics.
+The two model calls are independent, so this is genuine parallel fan-out. Use `context.WithTimeout` for deadlines, `rate.Limiter` for backpressure, and `backoff/v7` for retries (verified 2026-11-01). Use OpenTelemetry's `genaiconv` package for standard GenAI spans and token/cost metrics.
 
 ## Evals with plain `go test`
 
@@ -110,11 +110,6 @@ Use Temporal when the workflow must survive process restarts, run for hours or d
 ## Typed graph alternative (evaluate)
 
 Evaluate Eino (`github.com/cloudwego/eino`) when typed graph workflows and checkpoint/resume behavior are more important than minimal surface area. Pin and test the version you choose; it is not the default contract.
-
-
-## Larger agent frameworks (opt-in)
-
-Use Genkit (`github.com/firebase/genkit/go`) when the team explicitly wants local prompt/eval tooling. Use the Google Agent Development Kit (`google.golang.org/adk/v2`) for Google-centered agent graphs with MCP and telemetry. Both add runtime and dependency surface; choose them only for a concrete requirement.
 
 ## Contract shape
 

@@ -131,7 +131,7 @@ The same SDK's `mcp.NewClient` connects to third-party MCP servers. MCP's author
 
 ## Telemetry
 
-Emit the standard `gen_ai.*` semantic conventions so traces and token/cost metrics match other instrumented clients. OpenTelemetry ships a Go package for them (`go.opentelemetry.io/otel/semconv/<v>/genaiconv`). The example uses semconv v1.37.0, verified 2026-11-01:
+Emit the standard `gen_ai.*` semantic conventions so traces and token/cost metrics match other instrumented clients. OpenTelemetry ships a Go package for them (`go.opentelemetry.io/otel/semconv/<v>/genaiconv`). The example uses semconv v1.41.0, verified 2026-11-01; create the instrument once and keep the hot path a bare `Record`:
 
 ```go
 // internal/ai/telemetry.go
@@ -141,16 +141,23 @@ import (
 	"context"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/semconv/v1.37.0/genaiconv"
+	"go.opentelemetry.io/otel/semconv/v1.41.0/genaiconv"
 )
 
-func recordInputTokens(ctx context.Context, n int64) error {
-	usage, err := genaiconv.NewClientTokenUsage(otel.Meter("internal/ai"))
+type Telemetry struct {
+	tokens genaiconv.ClientTokenUsage
+}
+
+func NewTelemetry() (*Telemetry, error) {
+	tokens, err := genaiconv.NewClientTokenUsage(otel.Meter("internal/ai"))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	usage.Record(ctx, n, genaiconv.OperationNameChat, genaiconv.ProviderNameOpenAI, genaiconv.TokenTypeInput)
-	return nil
+	return &Telemetry{tokens: tokens}, nil
+}
+
+func (t *Telemetry) RecordInputTokens(ctx context.Context, n int64) {
+	t.tokens.Record(ctx, n, genaiconv.OperationNameChat, genaiconv.ProviderNameOpenAI, genaiconv.TokenTypeInput)
 }
 ```
 
@@ -160,7 +167,7 @@ Use Genkit (`github.com/firebase/genkit/go`) when the team explicitly wants a la
 
 ## Alternative: Google ADK (opt-in)
 
-Use the Google Agent Development Kit (`google.golang.org/adk/v2`) for Google-centered agent graphs with built-in MCP and telemetry. Its latest module requires a recent Go toolchain and brings a large runtime surface, so reach for it only when that cost is justified.
+Use the Google Agent Development Kit (`google.golang.org/adk/v2`) for Google-centered agent graphs with built-in MCP and telemetry. It brings a large cloud/runtime surface, so reach for it only when that cost is justified.
 
 ## Alternative: Local inference
 
