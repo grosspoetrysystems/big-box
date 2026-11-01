@@ -1,9 +1,16 @@
 # API Surface
 
 ## Extra deps
+None for the starter. Go 1.22+ `http.ServeMux` handles method and wildcard
+routing without a router dependency. When route grouping or middleware needs a
+third-party router, add chi:
+
 ```bash
-go get github.com/go-chi/chi/v5@latest github.com/go-chi/httplog/v2@latest
+go get github.com/go-chi/chi/v5@v5.5.0
 ```
+
+The starter uses the standard-library `log/slog`; add a logging dependency only
+when the service has a concrete need beyond it.
 
 ## Directory structure
 ```
@@ -18,46 +25,61 @@ internal/
 
 ## Entry file: cmd/server/main.go
 ```go
+// Package main runs the HTTP server.
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
+	"time"
 
 	apphttp "<module-path>/internal/http"
 )
 
 func main() {
 	addr := ":3000"
-	log.Printf("listening on %s", addr)
-	if err := http.ListenAndServe(addr, apphttp.NewRouter()); err != nil {
-		log.Fatal(err)
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	server := &http.Server{
+		Addr:              addr,
+		Handler:           apphttp.NewRouter(logger),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+
+	logger.Info("listening", "addr", addr)
+	if err := server.ListenAndServe(); err != nil {
+		logger.Error("server stopped", "error", err)
+		os.Exit(1)
 	}
 }
 ```
 
 ## Starter: internal/http/router.go
 ```go
+// Package http owns the API transport.
 package http
 
 import (
+	"log/slog"
 	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/httplog/v2"
 )
 
-func NewRouter() http.Handler {
-	r := chi.NewRouter()
-	r.Use(httplog.RequestLogger(httplog.NewLogger("app", httplog.Options{})))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+func NewRouter(logger *slog.Logger) http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("request", "method", r.Method, "path", r.URL.Path)
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("ready"))
+		_, _ = w.Write([]byte("ready\n"))
 	})
-	return r
+	return mux
 }
 ```
 
 ## Notes
-- Use `air` during development for long-running services
-- Keep transport concerns in `internal/http/`; push domain logic elsewhere
+- Use `air` during development for long-running services.
+- Keep transport concerns in `internal/http/`; push domain logic elsewhere.
+- Keep the server timeouts explicit; add graceful shutdown when lifecycle
+  management is introduced.

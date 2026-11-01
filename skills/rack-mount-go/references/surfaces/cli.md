@@ -2,7 +2,7 @@
 
 ## Extra deps
 ```bash
-go get github.com/spf13/cobra@latest
+go get github.com/spf13/cobra@v1.10.2
 ```
 
 ## Directory structure
@@ -18,6 +18,7 @@ internal/
 
 ## Entry file: cmd/<project-name>/main.go
 ```go
+// Package main starts the <project-name> command.
 package main
 
 import (
@@ -35,6 +36,7 @@ func main() {
 
 ## Starter: internal/cli/root.go
 ```go
+// Package cli builds the <project-name> command tree.
 package cli
 
 import "github.com/spf13/cobra"

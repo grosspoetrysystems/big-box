@@ -14,6 +14,7 @@ internal/
 
 ## Starter: pkg/<package>/<package>.go
 ```go
+// Package <package> provides the library's public API.
 package <package>
 
 type Service struct{}
