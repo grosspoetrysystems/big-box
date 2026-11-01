@@ -7,14 +7,18 @@ description: >
   "add LLM support", "set up structured output", "how should I structure
   the AI layer in Go".
 metadata:
-  version: "1.0"
-  author: whomst
+  version: "2.0"
+  author: Gross Poetry Systems
 license: MIT
 ---
 
 # Cable Run Go
 
 Wire the signal chain for AI-capable Go projects. Rack-mount-go sets up the project substrate — cable-run-go connects the inference layer.
+
+## Requirements
+
+Use Go 1.26 or newer, matching the project substrate supported by rack-mount-go and the current provider SDKs.
 
 ## When to use
 - Adding AI/LLM capabilities to an existing Go project
@@ -34,8 +38,8 @@ Cable-run-go is built on three contracts. Each has a default and named deviation
 | Contract | What it does | Default | Swap when |
 |----------|-------------|---------|-----------|
 | **Schema** | Structured I/O validation | Go structs + JSON Schema | CUE when schema-first configuration is the product |
-| **Model** | LLM access — chat, stream, structured output, embed | Official provider SDKs behind a thin local interface | Genkit when you explicitly want a larger framework |
-| **Workflow** | Multi-step orchestration | `context.Context` + small interfaces + `errgroup` | Temporal for durable execution, Eino for typed graph workflows |
+| **Model** | LLM access — chat, stream, structured output, embed, and tools | Official provider SDKs behind a thin local interface | Genkit or Google ADK when you explicitly want a larger agent framework |
+| **Workflow** | Multi-step orchestration | `context.Context` + small interfaces + `errgroup` | DBOS or Temporal for durable execution; evaluate Eino for typed graph workflows |
 
 ## Instructions
 
@@ -74,12 +78,14 @@ internal/
 ## Decision rule
 
 Use defaults for speed. Deviate only when a concrete requirement forces it:
-- durable workflows -> Temporal
+- durable workflows -> DBOS for a lighter embedded option; Temporal for long-running or externally coordinated execution
 - framework UX / local prompt tooling -> Genkit
-- typed graph orchestration -> Eino
+- Google-centered agent graphs -> Google ADK
+- typed graph orchestration -> evaluate Eino and pin the version
+
 
 If you're not sure, keep the default. The point is to own the interfaces and swap adapters later.
 
 ## Companion skill
 
-For project setup and Go tooling substrate, see `/rack-mount-go`.
+For project setup and Go tooling substrate, see [rack-mount-go](https://github.com/grosspoetrysystems/big-box/tree/main/skills/rack-mount-go).
