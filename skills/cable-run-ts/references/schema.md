@@ -8,7 +8,7 @@ Structured I/O validation — the typed boundary between your code and the outsi
 pnpm add zod
 ```
 
-Best general DX, largest ecosystem, native AI SDK integration, works everywhere. Zod 4 (stable since 2025) is much faster and lighter than v3 (~14× faster parsing, ~57% smaller core), and ships `@zod/mini` (`import * as z from "zod/mini"`) when you need a tree-shakeable subset for edge/browser bundles. The AI SDK and OpenAI Agents SDK both target Zod v4.
+Best general DX, largest ecosystem, native AI SDK integration, works everywhere. Zod 4 (stable since 2025) is much faster and lighter than v3 (~14× faster parsing, ~57% smaller core), and exposes the `zod/mini` entrypoint (`import * as z from "zod/mini"`) when you need a tree-shakeable subset for edge/browser bundles. The AI SDK and OpenAI Agents SDK both target Zod v4.
 
 ```typescript
 // src/ai/schema.ts
@@ -28,7 +28,7 @@ export type UserInput = z.infer<typeof UserInput>;
 pnpm add valibot
 ```
 
-Swap when: bundle size is the primary constraint and `@zod/mini` isn't enough. Valibot's modular design tree-shakes to under ~1KB for simple schemas. Same mental model, different internals. (With Zod 4's `@zod/mini` the gap is smaller than it was against Zod 3 — reach for Valibot when bundle size genuinely dominates, e.g. large schemas in a browser/edge bundle.)
+Swap when: bundle size is the primary constraint and `zod/mini` isn't enough. Valibot's modular design tree-shakes to under ~1KB for simple schemas. Same mental model, different internals. (With Zod 4's `zod/mini` the gap is smaller than it was against Zod 3 — reach for Valibot when bundle size genuinely dominates, e.g. large schemas in a browser/edge bundle.)
 
 ## Alternative: ArkType
 
@@ -47,3 +47,23 @@ Whatever library you use, the surface should import a typed schema, not the libr
 export type { UserInput } from "../ai/schema.js";
 export { UserInput as UserInputSchema } from "../ai/schema.js";
 ```
+
+## Standard Schema seam
+
+Keep the contract independent of the chosen validator by accepting a `StandardSchemaV1`. Add the small spec package when the seam is part of your public contract:
+
+```bash
+pnpm add @standard-schema/spec
+```
+
+```typescript
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+
+export async function parseInput<T>(schema: StandardSchemaV1<unknown, T>, value: unknown): Promise<T> {
+  const result = await schema["~standard"].validate(value);
+  if (result.issues) throw new Error("Invalid input");
+  return result.value;
+}
+```
+
+Zod, Valibot, and ArkType implement this seam. Keep each library's inference helpers in its adapter, but let surfaces depend on the standard schema contract.

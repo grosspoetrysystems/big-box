@@ -7,8 +7,8 @@ description: >
   "add LLM support", "set up structured output",
   "how should I structure the AI layer in TypeScript".
 metadata:
-  version: "1.0"
-  author: whomst
+  version: "2.0"
+  author: Gross Poetry Systems
 license: MIT
 ---
 
@@ -23,8 +23,8 @@ Wire the signal chain for AI-capable projects. Rack-mount sets up the physical g
 - "How should I structure the AI layer?"
 
 ## When NOT to use
-- Project setup (use rack-mount first)
-- Go projects: use `cable-run-go`
+- Project setup (use [rack-mount-ts](https://github.com/grosspoetrysystems/big-box/tree/main/skills/rack-mount-ts) first)
+- Go projects: use [cable-run-go](https://github.com/grosspoetrysystems/big-box/tree/main/skills/cable-run-go)
 - No AI/inference needs
 
 ## The contracts
@@ -34,8 +34,8 @@ Cable-run is built on three contracts. Each has a default and alternatives. The 
 | Contract | What it does | Default | Swap when |
 |----------|-------------|---------|-----------|
 | **Schema** | Structured I/O validation | Zod | Valibot (bundle size), ArkType (type-level validation) |
-| **Model** | LLM access — chat, stream, embed | Vercel AI SDK | Provider-native SDK (direct control), custom wrapper (local inference) |
-| **Workflow** | Multi-step orchestration | async functions | Effect (reliability, error channels), OpenAI Agents SDK (multi-agent delegation), durable execution (AI SDK `WorkflowAgent` / Vercel Workflow / Inngest — long-running, crash-safe) |
+| **Model** | LLM access — chat, stream, structured output, embed | Vercel AI SDK | Provider-native SDK (direct control), custom wrapper (local inference) |
+| **Workflow** | Multi-step orchestration | async functions | Effect (opt-in reliability), `@openai/agents` (multi-agent handoffs/guardrails), durable execution (long-running, crash-safe) |
 
 ## Instructions
 
@@ -52,6 +52,7 @@ Cable-run is built on three contracts. Each has a default and alternatives. The 
 | Schema | `references/schema.md` |
 | Model | `references/model.md` |
 | Workflow | `references/workflow.md` |
+| Operations (MCP, evals, tracing, caching) | `references/practices.md` |
 
 ## Architecture principle
 
@@ -62,7 +63,7 @@ src/
   ai/
     schema.ts      ← SchemaAdapter (Zod, Valibot, etc.)
     model.ts       ← ModelAdapter (AI SDK, native SDK, etc.)
-    workflow.ts    ← WorkflowAdapter (async, Effect, Agents SDK)
+    workflow.ts    ← WorkflowAdapter (async, Effect, Agents SDK, durable runtime)
   commands/        ← surface: imports from ai/
   routes/          ← surface: imports from ai/
   server.ts        ← surface: imports from ai/
@@ -74,5 +75,5 @@ Use defaults for speed. Swap when optimizing for a named constraint, not preempt
 
 ## Companion skill
 
-For project setup and dev tooling substrate, see `/rack-mount-ts`.
-For Go AI architecture, use the sibling `cable-run-go` skill.
+For project setup and dev tooling substrate, see [rack-mount-ts](https://github.com/grosspoetrysystems/big-box/tree/main/skills/rack-mount-ts).
+For Go AI architecture, use [cable-run-go](https://github.com/grosspoetrysystems/big-box/tree/main/skills/cable-run-go).
