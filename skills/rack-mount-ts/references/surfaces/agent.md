@@ -26,7 +26,7 @@ export default defineConfig({
 {
   "type": "module",
   "main": "dist/index.mjs",
-  "types": "dist/index.d.mts",
+  "types": "dist/index.d.mts"
 }
 ```
 

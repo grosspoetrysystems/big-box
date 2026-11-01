@@ -49,8 +49,7 @@ owns their project setup: it selects oxlint, writes `oxlint.config.*` /
 `oxfmt.config.*`, and migrates an existing ESLint/Prettier/Biome config out of
 the way. The other layers are copied from `references/`.
 
-Node floor: `engines.node` `>=24.11` (the current LTS line); exercise Node 26 in
-CI as well.
+Node floor: `engines.node` `>=24.11`; exercise Node 26 in CI as well.
 
 > **Build note:** tsdown (Rolldown-based) is the default bundler, and converts an
 > existing tsup setup with `npx tsdown-migrate`. tsup is still maintained, so a
@@ -147,9 +146,7 @@ Install it with `pnpm add -D vite-plus`, then use `vp migrate` to preview the
 conversion before accepting it.
 Reach for it when one tool beats eight — new Vite apps, libraries, or monorepos.
 Keep the à-la-carte substrate for Node-only APIs/CLIs and for framework-owned
-builds. Vite+ 1.0 is young and some monorepo/remote-cache features are still on
-its roadmap, so pilot it (`vp migrate` on a branch) before making it the house
-default. `vp migrate` preserves an existing Lefthook/Husky setup and leaves
+builds. Migration preserves an existing Lefthook/Husky setup and leaves
 commit-message rules to Commitlint — don't stack two hook dispatchers.
 
 ## Companion skill
