@@ -11,10 +11,6 @@ Agent skills from [Gross Poetry Systems](https://grosspoetry.systems). Each one 
 
 `npx skills add grosspoetrysystems/big-box` without `--skill` lets you choose from the list. `npx skills update` brings installed copies up to date.
 
-## Working on the skills
-
-`scripts/install` symlinks every skill in this checkout into `~/.agents/skills`, or into the directory you pass, so local agents read the current files.
-
 ---
 
 *A gross poetry systems product.*
