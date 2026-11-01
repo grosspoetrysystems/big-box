@@ -8,7 +8,7 @@ Multi-step orchestration in Go should default to plain Go.
 go get golang.org/x/sync/errgroup@latest
 go get golang.org/x/time/rate@latest
 go get go.opentelemetry.io/otel@latest
-go get github.com/cenkalti/backoff/v5@latest
+go get github.com/cenkalti/backoff/v7@latest
 ```
 
 ```go
@@ -22,26 +22,26 @@ import (
 )
 
 func AnalyzeAndSummarize(ctx context.Context, client Client, input string) (Result, Result, error) {
+	g, ctx := errgroup.WithContext(ctx)
 	var analysis Result
 	var summary Result
 
-	analysis, err := client.Generate(ctx, GenerateRequest{
-		System: "Analyze the input",
-		Messages: []Message{
-			{Role: "user", Content: input},
-		},
+	g.Go(func() error {
+		var err error
+		analysis, err = client.Generate(ctx, GenerateRequest{
+			System: "Analyze the input",
+			Messages: []Message{
+				{Role: "user", Content: input},
+			},
+		})
+		return err
 	})
-	if err != nil {
-		return Result{}, Result{}, err
-	}
-
-	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		var err error
 		summary, err = client.Generate(ctx, GenerateRequest{
-			System: "Summarize the analysis",
+			System: "Summarize the input",
 			Messages: []Message{
-				{Role: "user", Content: analysis.Text},
+				{Role: "user", Content: input},
 			},
 		})
 		return err
@@ -50,20 +50,66 @@ func AnalyzeAndSummarize(ctx context.Context, client Client, input string) (Resu
 	if err := g.Wait(); err != nil {
 		return Result{}, Result{}, err
 	}
-
 	return analysis, summary, nil
 }
 ```
 
-Use `context.WithTimeout` for deadlines, `rate.Limiter` for backpressure, `backoff/v5` for retries, and OpenTelemetry for spans and token/cost metrics.
+The two model calls are independent, so this is genuine parallel fan-out. Use `context.WithTimeout` for deadlines, `rate.Limiter` for backpressure, and `backoff/v7` for retries (verified 2026-11-01). Use OpenTelemetry's `genaiconv` package for standard GenAI spans and token/cost metrics.
 
-## Alternative: Temporal
+## Evals with plain `go test`
 
-Use Temporal when the workflow must survive process restarts, run for hours or days, or wait on human approval.
+Keep evals close to the contract and use a fake model for deterministic tests. Ordinary table tests or golden files are enough; add an LLM-as-judge helper only when a human-labeled rubric cannot cover the behavior.
 
-## Alternative: Eino
+```go
+// internal/ai/eval_test.go
+package ai
 
-Use Eino when typed graph workflows and checkpoint/resume behavior are more important than minimal surface area.
+import (
+	"context"
+	"iter"
+	"testing"
+)
+
+type fakeClient struct{}
+
+func (fakeClient) Generate(context.Context, GenerateRequest) (Result, error) {
+	return Result{Text: `{"answer":"ok"}`}, nil
+}
+
+func (fakeClient) Stream(context.Context, GenerateRequest) iter.Seq2[Chunk, error] {
+	return func(yield func(Chunk, error) bool) {
+		yield(Chunk{Delta: "ok", Done: true}, nil)
+	}
+}
+
+func (fakeClient) Embed(context.Context, []string) ([][]float32, error) {
+	return [][]float32{{1}}, nil
+}
+
+func TestAnswerEval(t *testing.T) {
+	got, err := GenerateAs[struct {
+		Answer string `json:"answer"`
+	}](context.Background(), fakeClient{}, GenerateRequest{
+		Messages: []Message{{Role: "user", Content: "answer"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Answer != "ok" {
+		t.Fatalf("answer = %q, want %q", got.Answer, "ok")
+	}
+}
+```
+
+Run this with `go test ./...`; no paid model call is needed.
+
+## Durable alternatives
+
+Use Temporal when the workflow must survive process restarts, run for hours or days, or wait on human approval. Use DBOS (`github.com/dbos-inc/dbos-transact-golang`) when you want lighter library-embedded durable execution backed by SQLite or Postgres. Both are deliberate deviations from the plain-Go default.
+
+## Typed graph alternative (evaluate)
+
+Evaluate Eino (`github.com/cloudwego/eino`) when typed graph workflows and checkpoint/resume behavior are more important than minimal surface area. Pin and test the version you choose; it is not the default contract.
 
 ## Contract shape
 
