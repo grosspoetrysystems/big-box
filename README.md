@@ -11,6 +11,8 @@ Agent skills from [Gross Poetry Systems](https://grosspoetry.systems). Each one 
 
 `npx skills add grosspoetrysystems/big-box` without `--skill` lets you choose from the list. `npx skills update` brings installed copies up to date.
 
+MIT licensed. See [LICENSE](LICENSE).
+
 ---
 
 *A gross poetry systems product.*
