@@ -19,4 +19,4 @@ pnpm add zod
 - TanStack Start has its own build system — do NOT override with tsdown
 - Keep `tsdown.config.ts` only if there's a separate library/CLI entry alongside the app
 - `vitest.config.ts` thresholds may need adjustment for app code vs library code
-- Substrate configs (biome, lefthook, commitlint, knip) layer cleanly on top
+- Substrate configs (oxlint, oxfmt, lefthook, commitlint, knip) layer cleanly on top

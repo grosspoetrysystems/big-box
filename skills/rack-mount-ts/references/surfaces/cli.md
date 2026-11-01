@@ -1,57 +1,58 @@
 # CLI Surface
 
 ## Framework
-Incur is the default CLI framework for agent-aware commands. It provides typed
-schemas, structured output, MCP exposure, generated skills, and machine-readable
-command manifests. Keep Ink when the CLI needs interactive terminal rendering.
 
-For a minimal human-first CLI, Commander is a valid lower-opinion alternative:
+Commander is the default for a small, human-first CLI:
 
 ```bash
 pnpm add commander
 ```
 
-Do not install Commander and incur unless the project has a deliberate reason to
-use both.
+Use Incur when the CLI is agent-native and needs typed schemas, structured
+output, MCP exposure, generated skills, or machine-readable command manifests:
 
-## Extra deps
 ```bash
 pnpm add incur
 ```
 
-Add Ink only for interactive terminal UIs:
+Keep Ink only when the CLI needs interactive terminal rendering:
 
 ```bash
 pnpm add ink @inkjs/ui
-pnpm add -D @types/ink
 ```
 
+Do not install Commander and Incur unless the project has a deliberate reason to
+use both. Ink provides its own types; do not add an `@types/ink` stub.
+
 ## tsdown.config.ts
+
 ```typescript
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
+  banner: { js: "#!/usr/bin/env node" },
+  clean: true,
   entry: { cli: "src/bin/cli.ts" },
   format: "esm",
-  target: "node22",
   outDir: "dist",
-  clean: true,
   sourcemap: true,
-  banner: { js: "#!/usr/bin/env node" },
+  target: "node24",
 });
 ```
 
 ## package.json additions
+
 ```json
 {
   "type": "module",
   "bin": {
-    "<project-name>": "dist/cli.js"
+    "<project-name>": "dist/cli.mjs"
   }
 }
 ```
 
 ## Directory structure
+
 ```
 src/
   bin/
@@ -60,27 +61,29 @@ src/
 ```
 
 ## Entry file: src/bin/cli.ts
+
 ```typescript
-import { Cli, z } from "incur";
+import { Command } from "commander";
 
-const cli = Cli.create("<project-name>", {
-  version: "0.1.0",
-  description: "<description>",
-});
+const program = new Command();
 
-cli.command("status", {
-  output: z.object({
-    ready: z.boolean(),
-  }),
-  run() {
-    return { ready: true };
-  },
-});
+program
+  .name("<project-name>")
+  .description("<description>")
+  .version("0.1.0");
 
-cli.serve();
+program
+  .command("status")
+  .description("report readiness")
+  .action(() => {
+    process.stdout.write("ready\n");
+  });
+
+program.parse();
 ```
 
 ## Scripts override
+
 ```json
 {
   "dev": "tsx src/bin/cli.ts"

@@ -10,7 +10,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm"],
-  target: "node22",
+  target: "node24",
   outDir: "dist",
   clean: true,
   sourcemap: true,
@@ -22,8 +22,8 @@ export default defineConfig({
 ```json
 {
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
   "files": ["dist"]
 }
 ```

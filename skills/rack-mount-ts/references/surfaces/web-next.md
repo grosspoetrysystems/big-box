@@ -23,7 +23,7 @@ pnpm add zod
 - Next has its own build system (Turbopack/webpack) — do NOT override with tsdown
 - Keep `tsdown.config.ts` only if there's a separate library/CLI entry alongside the app
 - `vitest.config.ts` thresholds may need adjustment for app code vs library code
-- Substrate configs (biome, lefthook, commitlint, knip) layer cleanly on top
+- Substrate configs (oxlint, oxfmt, lefthook, commitlint, knip) layer cleanly on top
 
 ## AI best practices (App Router)
 - **Stream from Route Handlers.** Put inference in `app/api/*/route.ts` and
@@ -37,4 +37,4 @@ pnpm add zod
 - **Cache static prompts.** Reuse system prompts and tool definitions across
   requests to benefit from provider prompt caching.
 - For model adapters, schema contracts, and workflow/agent architecture, use the
-  companion skill `/cable-run` — don't reinvent inference plumbing here.
+  [cable-run-ts companion skill](https://github.com/grosspoetrysystems/big-box/tree/main/skills/cable-run-ts) — don't reinvent inference plumbing here.

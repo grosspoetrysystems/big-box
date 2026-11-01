@@ -2,7 +2,7 @@
 
 ## Extra deps
 ```bash
-pnpm add hono effect zod
+pnpm add hono @hono/node-server zod
 ```
 
 ## tsdown.config.ts
@@ -12,7 +12,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: ["src/server.ts"],
   format: "esm",
-  target: "node22",
+  target: "node24",
   outDir: "dist",
   clean: true,
   sourcemap: true,
@@ -59,6 +59,6 @@ export default app;
 
 ## Notes
 - Hono for the HTTP layer — works on Node, Deno, Bun, Cloudflare Workers
-- Effect for the operational core — error handling, concurrency, dependency injection
+- Effect is optional for the operational core when the service needs typed errors, concurrency, dependency injection, or tracing.
 - Zod for request/response validation
-- Add `@hono/node-server` for Node deployment
+- Add `effect` only when that runtime model is a deliberate choice.
