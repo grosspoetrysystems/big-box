@@ -5,9 +5,7 @@ Use the native Go toolchain first. Add helper tools only where they remove frict
 ## Bootstrap
 
 Initialize the module, set the supported Go floor, and record development tools
-with Go tool directives. The versions below were verified against
-`proxy.golang.org` on 2026-11-01; keep the version in the command when
-upgrading deliberately.
+with Go tool directives.
 
 ```bash
 go mod init <module-path>
@@ -28,15 +26,7 @@ For a long-running application, also add the development runner:
 go get -tool github.com/air-verse/air@v1.67.4
 ```
 
-Run tools from the module so the recorded versions are used:
-
-```bash
-go tool lefthook install
-go tool golangci-lint config verify
-go tool golangci-lint fmt ./...
-go tool golangci-lint run ./...
-go tool govulncheck ./...
-```
+Run tools with `go tool` so the recorded versions are used.
 
 Libraries do not need `air`. GoReleaser is an optional tool for a CLI that
 publishes cross-platform binaries; add

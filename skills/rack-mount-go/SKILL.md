@@ -81,15 +81,12 @@ common project types. Presets are in `references/surfaces/`.
      existing build, test, race, and coverage commands.
    Merge with what exists; remove conflicting tools and duplicate wrappers
    instead of creating a second convention.
-6. Make the hook executable, install Lefthook, and run the full checks:
-   `go tool lefthook install`, `go tool golangci-lint config verify`,
-   `go tool golangci-lint fmt ./...`, `go build ./...`, `go vet ./...`,
-   `go test -race -cover ./...`, `go tool golangci-lint run ./...`, and
-   `go tool govulncheck ./...`.
-7. Create the selected entry files, then commit the formatted, linted, tested
-   project. The commit hook validates the first non-comment line, accepts
-   bodies and footers, and passes through Merge, Revert, `fixup!`, and
-   `squash!` messages.
+6. Create the selected entry files, make the hook executable, and install
+   Lefthook with `go tool lefthook install`.
+7. Run the checks in `references/tooling.md` ("After copying"), then commit the
+   formatted, linted, tested project. The commit hook validates the first
+   non-comment line, accepts bodies and footers, and passes through Merge,
+   Revert, `fixup!`, and `squash!` messages.
 
 ## Companion skills
 
